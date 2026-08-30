@@ -1,0 +1,746 @@
+/* Session page — lives inside the same .mt-page token system as the
+   dashboard (dashboard.css), so this file only adds session-specific
+   components: the hero, the stage card, the voice orb, and premium
+   form/modal touches. Nothing here redefines --mt-* tokens. */
+
+/* ---------------- hero (single-column, centered — this page has one
+   job at a time, unlike the dashboard's grid) ---------------- */
+.mts-hero {
+  position: relative;
+  overflow: hidden;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 64px 24px 8px;
+  text-align: center;
+}
+.mts-hero::before {
+  content: "";
+  position: absolute;
+  top: -180px;
+  left: 50%;
+  width: 480px;
+  height: 480px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(126, 217, 87, 0.5) 0%, rgba(126, 217, 87, 0) 70%);
+  opacity: 0.18;
+  pointer-events: none;
+  animation: mt-blob-drift 9s ease-in-out infinite;
+}
+.mts-hero h1 {
+  position: relative;
+  z-index: 1;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin: 16px 0 8px;
+}
+.mts-hero p {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 15.5px;
+  color: var(--mt-gray);
+  max-width: 440px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ---------------- stage area ---------------- */
+.mts-stage {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+  margin: 28px auto 100px;
+  padding: 0 20px;
+}
+.mts-panel {
+  background: var(--mt-white);
+  border: 1px solid var(--mt-border);
+  border-radius: 24px;
+  box-shadow: var(--mt-shadow-card);
+  padding: 36px 30px;
+  text-align: center;
+}
+.mts-panel.mts-tinted {
+  background: var(--mt-white);
+  border-color: var(--mt-border);
+}
+.mts-panel-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--mt-black);
+  margin: 0 0 6px;
+}
+.mts-panel-sub {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 14.5px;
+  color: var(--mt-gray);
+  line-height: 1.65;
+  margin: 0;
+}
+.mts-error {
+  margin-top: 14px;
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 13.5px;
+  color: #c0392b;
+  background: #fdf0ee;
+  border: 1px solid #f3d4cf;
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+/* ---------------- the voice orb — the one signature element.
+   Ready: slow breathing. Connecting: a spinning halo. Live: two
+   concentric rings, colored by whoever is currently speaking, so the
+   orb itself communicates turn-taking instead of a static waveform. ---------------- */
+.mts-orb-wrap {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 4px auto 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mts-orb-core {
+  position: relative;
+  z-index: 2;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mt-green);
+  color: #f9fef5;
+  box-shadow: 0 10px 28px rgba(63, 122, 40, 0.32);
+}
+.mts-orb-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(126, 217, 87, 0.45);
+}
+.mts-orb-wrap.mts-ready .mts-orb-core {
+  animation: mts-breathe 2.6s ease-in-out infinite;
+}
+.mts-orb-wrap.mts-ready .mts-orb-ring {
+  animation: mts-breathe-ring 2.6s ease-in-out infinite;
+}
+.mts-orb-wrap.mts-connecting .mts-orb-ring {
+  border-style: dashed;
+  border-color: rgba(63, 122, 40, 0.55);
+  animation: mts-spin 1.4s linear infinite;
+}
+.mts-orb-wrap.mts-connecting .mts-orb-core {
+  animation: mts-breathe 1.1s ease-in-out infinite;
+}
+.mts-orb-wrap.mts-live .mts-orb-ring {
+  animation: mts-pulse-ring 1.6s ease-out infinite;
+}
+.mts-orb-wrap.mts-live .mts-orb-core {
+  animation: mts-breathe 2.6s ease-in-out infinite;
+}
+.mts-orb-wrap.mts-live.mts-turn-examiner .mts-orb-core {
+  background: linear-gradient(135deg, #f0b94e 0%, #c98a1c 100%);
+  box-shadow: 0 10px 28px rgba(156, 107, 18, 0.32);
+}
+.mts-orb-wrap.mts-live.mts-turn-examiner .mts-orb-ring {
+  border-color: rgba(224, 167, 59, 0.5);
+}
+@keyframes mts-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+@keyframes mts-breathe-ring {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.18); opacity: 0.15; }
+}
+@keyframes mts-pulse-ring {
+  0% { transform: scale(0.85); opacity: 0.7; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+@keyframes mts-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mts-orb-core, .mts-orb-ring { animation: none !important; }
+}
+
+/* ---------------- Part 1 guide card — sits on the dark .mts-exam-body,
+   so it's a plain white card (not the cream/tinted tokens used on the
+   light pages) to read clearly against that background. Floats gently
+   at rest; hovering settles it, which also makes the text easier to
+   read while the student is looking at it. ---------------- */
+.mts-part1-guide {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  background: var(--mt-white);
+  border-radius: 16px;
+  padding: 18px 26px;
+  margin: 0 auto 34px;
+  text-align: left;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+  animation: mts-float 4s ease-in-out infinite;
+}
+.mts-part1-guide:hover {
+  animation-play-state: paused;
+}
+.mts-part1-guide-topic {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--mt-border);
+}
+.mts-part1-guide-label {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 12px;
+  color: var(--mt-gray);
+}
+.mts-part1-guide-topic strong {
+  font-size: 15.5px;
+  color: var(--mt-green-deep);
+}
+.mts-cue-card-waiting {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--mt-gray);
+}
+.mts-part1-guide-row {
+  display: flex;
+  gap: 11px;
+  padding: 6px 0;
+}
+.mts-part1-guide-row + .mts-part1-guide-row {
+  border-top: 1px solid var(--mt-border);
+}
+.mts-part1-guide-row svg { flex: none; margin-top: 2px; color: var(--mt-green-deep); }
+.mts-part1-guide-row strong {
+  display: block;
+  font-size: 13.5px;
+  color: var(--mt-black);
+  margin-bottom: 2px;
+}
+.mts-part1-guide-row span {
+  display: block;
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 12.5px;
+  color: var(--mt-gray);
+  line-height: 1.55;
+}
+@keyframes mts-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mts-part1-guide { animation: none !important; }
+}
+
+.mts-live-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--mt-green-deep);
+  margin-bottom: 4px;
+}
+.mts-live-label .mts-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mt-green);
+  animation: mt-pulse 1.6s ease-in-out infinite;
+}
+.mts-timer {
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--mt-gray);
+  margin-bottom: 18px;
+}
+.mts-reconnect-note {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 12.5px;
+  color: #9c6b12;
+  background: #fdf1dc;
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+}
+
+/* ---------------- transcript ---------------- */
+.mts-transcript {
+  text-align: left;
+  max-height: 260px;
+  overflow-y: auto;
+  background: var(--mt-cream);
+  border: 1px solid var(--mt-border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.mts-transcript p {
+  margin: 0 0 6px;
+  color: var(--mt-black);
+}
+.mts-transcript p:last-child { margin-bottom: 0; }
+.mts-transcript .mts-empty {
+  color: #a6a296;
+}
+.mts-transcript strong.mts-examiner { color: #9c6b12; }
+.mts-transcript strong.mts-student { color: var(--mt-green-deep); }
+
+/* ---------------- form fields ---------------- */
+.mts-field { text-align: left; margin-bottom: 14px; }
+.mts-field label {
+  display: block;
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--mt-black);
+  margin-bottom: 6px;
+}
+.mts-field input {
+  width: 100%;
+  border: 1.5px solid var(--mt-border);
+  background: var(--mt-cream-2);
+  border-radius: 14px;
+  padding: 12px 15px;
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 15px;
+  color: var(--mt-black);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.mts-field input:focus {
+  border-color: var(--mt-green);
+  box-shadow: 0 0 0 4px rgba(126, 217, 87, 0.22);
+}
+.mts-note {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 12.5px;
+  color: var(--mt-gray);
+  text-align: left;
+  margin-bottom: 16px;
+}
+.mts-note a, .mts-panel a.mts-link {
+  color: var(--mt-green-deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ---------------- premium instructions modal (extends
+   .mt-modal-backdrop / .mt-modal from dashboard.css) ---------------- */
+.mts-modal { max-width: 500px; position: relative; overflow: hidden; }
+.mts-modal::before {
+  content: "";
+  position: absolute;
+  top: -90px;
+  right: -70px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(126, 217, 87, 0.4) 0%, rgba(126, 217, 87, 0) 70%);
+  pointer-events: none;
+}
+.mts-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mt-gray);
+  transition: background 0.15s ease, color 0.15s ease;
+  z-index: 2;
+}
+.mts-modal-close:hover { background: var(--mt-border); color: var(--mt-black); }
+.mts-rule {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 13px;
+  background: var(--mt-cream);
+  border-radius: 14px;
+  padding: 13px 15px;
+  margin-bottom: 10px;
+  text-align: left;
+}
+.mts-rule svg { flex: none; margin-top: 2px; color: var(--mt-green-deep); }
+.mts-rule strong {
+  display: block;
+  font-size: 14px;
+  color: var(--mt-black);
+  margin-bottom: 2px;
+}
+.mts-rule span {
+  display: block;
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 13px;
+  color: var(--mt-gray);
+  line-height: 1.55;
+}
+.mts-modal-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+.mts-modal-actions .mt-btn { flex: 1; justify-content: center; }
+
+@media (max-width: 560px) {
+  .mts-hero { padding: 44px 20px 4px; }
+  .mts-hero h1 { font-size: 27px; }
+  .mts-panel { padding: 28px 20px; }
+  .mts-modal-actions { flex-direction: column-reverse; }
+}
+
+/* ---------------- exam room — takes over the whole viewport once the
+   test actually starts (connecting → live → saving). Dark and quiet on
+   purpose: the marketing/dashboard chrome (navbar, cream, blobs) goes
+   away, and what's left reads like real exam software, not a product
+   page. Reuses the same dark gradient the dashboard already uses on
+   card hover (#223318 → #15170F), so it's the brand's own accent
+   turned up, not a new palette bolted on. ---------------- */
+.mts-exam-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle at 18% 8%, rgba(126, 217, 87, 0.09) 0%, rgba(126, 217, 87, 0) 45%),
+    linear-gradient(160deg, #1a1d13 0%, #101209 100%);
+  color: #f4f2e8;
+  animation: mts-exam-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes mts-exam-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mts-exam-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 26px;
+  border-bottom: 1px solid rgba(244, 242, 232, 0.09);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.mts-exam-id {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+.mts-exam-id .mts-exam-name {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #f4f2e8;
+}
+.mts-exam-id .mts-exam-type {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 12px;
+  color: rgba(244, 242, 232, 0.5);
+  letter-spacing: 0.2px;
+}
+.mts-exam-status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.mts-part-badge {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #a6e88a;
+  background: rgba(126, 217, 87, 0.12);
+  border: 1px solid rgba(126, 217, 87, 0.3);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+.mts-prep-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  font-variant-numeric: tabular-nums;
+  color: #ffcf6b;
+  background: rgba(255, 207, 107, 0.12);
+  border: 1px solid rgba(255, 207, 107, 0.3);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+.mts-rec {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: #ff6b5e;
+  background: rgba(255, 107, 94, 0.12);
+  border: 1px solid rgba(255, 107, 94, 0.3);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+.mts-rec .mts-rec-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff6b5e;
+  animation: mt-pulse 1.4s ease-in-out infinite;
+}
+.mts-exam-clock {
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f4f2e8;
+  letter-spacing: 0.5px;
+}
+
+.mts-exam-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  text-align: center;
+}
+.mts-exam-body-title { color: #f4f2e8; }
+.mts-exam-body-sub { color: rgba(244, 242, 232, 0.5); }
+.mts-exam-body .mts-live-label { color: #a6e88a; }
+.mts-exam-body .mts-live-label .mts-dot { background: #a6e88a; }
+.mts-exam-body .mts-reconnect-note {
+  background: rgba(224, 167, 59, 0.15);
+  color: #e0a73b;
+  border: 1px solid rgba(224, 167, 59, 0.25);
+}
+
+.mts-examiner-presence {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 400px;
+  background: rgba(244, 242, 232, 0.045);
+  border: 1px solid rgba(244, 242, 232, 0.1);
+  border-radius: 999px;
+  padding: 10px 16px 10px 10px;
+  margin-top: 0;
+  text-align: left;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+.mts-examiner-presence.mts-turn-examiner {
+  border-color: rgba(240, 185, 78, 0.4);
+  background: rgba(240, 185, 78, 0.07);
+}
+.mts-examiner-avatar {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(244, 242, 232, 0.08);
+  color: rgba(244, 242, 232, 0.55);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.mts-examiner-presence.mts-turn-examiner .mts-examiner-avatar {
+  background: rgba(240, 185, 78, 0.22);
+  color: #f0b94e;
+}
+.mts-examiner-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+.mts-examiner-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #f4f2e8;
+}
+.mts-examiner-state {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 11.5px;
+  color: rgba(244, 242, 232, 0.45);
+}
+.mts-examiner-presence.mts-turn-examiner .mts-examiner-state { color: #f0b94e; }
+
+.mts-waveform {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+}
+.mts-waveform span {
+  width: 3px;
+  height: 6px;
+  border-radius: 2px;
+  background: rgba(244, 242, 232, 0.3);
+  transition: background 0.3s ease;
+  animation: mts-wave-idle 2.2s ease-in-out infinite;
+}
+.mts-examiner-presence.mts-turn-examiner .mts-waveform span {
+  background: #f0b94e;
+  animation-name: mts-wave-active;
+  animation-duration: 0.9s;
+}
+.mts-waveform span:nth-child(1) { animation-delay: 0s; }
+.mts-waveform span:nth-child(2) { animation-delay: 0.12s; }
+.mts-waveform span:nth-child(3) { animation-delay: 0.24s; }
+.mts-waveform span:nth-child(4) { animation-delay: 0.36s; }
+.mts-waveform span:nth-child(5) { animation-delay: 0.48s; }
+@keyframes mts-wave-idle {
+  0%, 100% { height: 5px; }
+  50% { height: 9px; }
+}
+@keyframes mts-wave-active {
+  0%, 100% { height: 6px; }
+  50% { height: 19px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mts-waveform span { animation: none !important; }
+}
+
+.mts-exam-checklist {
+  width: 100%;
+  max-width: 340px;
+  margin: 10px 0 4px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mts-exam-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 13.5px;
+  color: rgba(244, 242, 232, 0.55);
+}
+.mts-exam-check.mts-check-done { color: rgba(166, 232, 138, 0.9); }
+.mts-exam-check.mts-check-active { color: #f4f2e8; }
+.mts-exam-check svg { flex: none; }
+
+.mts-exam-footer {
+  padding: 18px 20px 26px;
+  text-align: center;
+}
+.mts-exam-footer .mts-exam-hint {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 12px;
+  color: rgba(244, 242, 232, 0.4);
+  margin-top: 10px;
+}
+.mts-exam-footer .mt-btn.mt-ghost {
+  background: transparent;
+  border-color: rgba(244, 242, 232, 0.25);
+  color: #f4f2e8;
+}
+.mts-exam-footer .mt-btn.mt-ghost:hover { border-color: #f4f2e8; }
+
+.mts-exam-body .mts-orb-core { box-shadow: 0 10px 34px rgba(126, 217, 87, 0.22); }
+.mts-exam-body .mts-orb-wrap.mts-live.mts-turn-examiner .mts-orb-core {
+  box-shadow: 0 10px 34px rgba(224, 167, 59, 0.25);
+}
+
+@media (max-width: 560px) {
+  .mts-exam-header { padding: 14px 16px; }
+  .mts-exam-id .mts-exam-name { font-size: 13px; }
+}
+
+/* ---------------- exam room theme toggle — a small sun/moon button in
+   the header so students can switch the exam room to a light view. ---------------- */
+.mts-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(244, 242, 232, 0.18);
+  background: rgba(244, 242, 232, 0.08);
+  color: #f4f2e8;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+.mts-theme-toggle:hover {
+  background: rgba(244, 242, 232, 0.16);
+}
+
+/* ---------------- light view — same cream palette as the mock-test
+   dashboard (.mt-page's --mt-cream tokens), for students who'd rather
+   not stare at a dark screen during the test. ---------------- */
+.mts-exam-shell.mts-light {
+  background: linear-gradient(180deg, var(--mt-cream) 0%, var(--mt-cream-2) 100%);
+  color: var(--mt-black);
+}
+.mts-exam-shell.mts-light .mts-exam-header {
+  border-bottom-color: var(--mt-border);
+}
+.mts-exam-shell.mts-light .mts-exam-id .mts-exam-name { color: var(--mt-black); }
+.mts-exam-shell.mts-light .mts-exam-id .mts-exam-type { color: var(--mt-gray); }
+.mts-exam-shell.mts-light .mts-exam-clock { color: var(--mt-black); }
+.mts-exam-shell.mts-light .mts-part-badge { color: var(--mt-green-deep); }
+.mts-exam-shell.mts-light .mts-prep-badge { color: #a86c0c; }
+.mts-exam-shell.mts-light .mts-theme-toggle {
+  border-color: var(--mt-border);
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--mt-black);
+}
+.mts-exam-shell.mts-light .mts-theme-toggle:hover { background: rgba(0, 0, 0, 0.08); }
+
+.mts-exam-shell.mts-light .mts-exam-body-title,
+.mts-exam-shell.mts-light .mts-panel-title { color: var(--mt-black); }
+.mts-exam-shell.mts-light .mts-exam-body-sub,
+.mts-exam-shell.mts-light .mts-panel-sub { color: var(--mt-gray); }
+
+.mts-exam-shell.mts-light .mts-exam-check { color: var(--mt-gray); }
+.mts-exam-shell.mts-light .mts-exam-check.mts-check-done { color: var(--mt-green-deep); }
+.mts-exam-shell.mts-light .mts-exam-check.mts-check-active { color: var(--mt-black); }
+
+.mts-exam-shell.mts-light .mts-exam-body .mts-live-label { color: var(--mt-green-deep); }
+.mts-exam-shell.mts-light .mts-exam-body .mts-live-label .mts-dot { background: var(--mt-green); }
+
+.mts-exam-shell.mts-light .mts-examiner-presence {
+  background: rgba(0, 0, 0, 0.035);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+.mts-exam-shell.mts-light .mts-examiner-presence.mts-turn-examiner {
+  border-color: rgba(240, 185, 78, 0.5);
+  background: rgba(240, 185, 78, 0.1);
+}
+.mts-exam-shell.mts-light .mts-examiner-avatar {
+  background: rgba(0, 0, 0, 0.055);
+  color: rgba(0, 0, 0, 0.45);
+}
+.mts-exam-shell.mts-light .mts-examiner-name { color: var(--mt-black); }
+.mts-exam-shell.mts-light .mts-examiner-state { color: var(--mt-gray); }
+.mts-exam-shell.mts-light .mts-waveform span { background: rgba(0, 0, 0, 0.22); }
+
+.mts-exam-shell.mts-light .mts-exam-footer .mts-exam-hint { color: var(--mt-gray); }
+.mts-exam-shell.mts-light .mts-exam-footer .mt-btn.mt-ghost {
+  border-color: var(--mt-border);
+  color: var(--mt-black);
+}
+.mts-exam-shell.mts-light .mts-exam-footer .mt-btn.mt-ghost:hover { border-color: var(--mt-gray); }
