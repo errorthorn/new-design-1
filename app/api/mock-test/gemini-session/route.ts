@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI, Modality, Type } from "@google/genai";
+import type { FunctionDeclaration } from "@google/genai";
 import { supabaseServer } from "@/lib/supabase";
 import { requireActiveMember } from "@/lib/api-auth";
 import { computeEligibility, getWeekProgram } from "@/lib/mock-test";
@@ -153,9 +154,10 @@ export async function POST(req: NextRequest) {
         parameters: {
           type: Type.OBJECT,
           properties: {},
+          required: [],
         },
       },
-    ],
+    ] as FunctionDeclaration[],
   };
 
   const systemInstruction = hasAnyQuestions
