@@ -44,10 +44,12 @@ export async function GET(req: NextRequest) {
     countOnly
       ? Promise.resolve({ data: [] as { id: string; title: string }[], error: null })
       : supabaseServer.from("quizzes").select("id, title").in("id", quizIds),
-    supabaseServer
-      .from("quiz_questions")
-      .select(countOnly ? "id, quiz_id, correct_index" : "id, quiz_id, question, options, correct_index, explanation")
-      .in("quiz_id", quizIds),
+    countOnly
+      ? supabaseServer.from("quiz_questions").select("id, quiz_id, correct_index").in("quiz_id", quizIds)
+      : supabaseServer
+          .from("quiz_questions")
+          .select("id, quiz_id, question, options, correct_index, explanation")
+          .in("quiz_id", quizIds),
   ]);
 
   if (quizzesRes.error) {
