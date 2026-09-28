@@ -1,0 +1,490 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-cream text-ink font-body antialiased;
+}
+
+::selection {
+  @apply bg-leaf-300 text-ink;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.focus-ring {
+  @apply outline-none ring-offset-2 ring-offset-cream focus-visible:ring-2 focus-visible:ring-leaf-600;
+}
+
+/* ============================================
+   Testimonial marquee — two rows of review cards drifting in opposite
+   directions, each row's content duplicated once so the loop is seamless
+   (translateX 0 → -50% lands exactly back on the same visual frame).
+   Hovering a row pauses it so a review can actually be read; the edges
+   fade via a mask so cards don't feel like they're cut off mid-scroll.
+   ============================================ */
+.marquee-row {
+  -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+}
+.marquee-track {
+  animation: marquee-left 90s linear infinite;
+  will-change: transform;
+}
+.marquee-track-reverse {
+  animation: marquee-right 100s linear infinite;
+  will-change: transform;
+}
+.marquee-row:hover .marquee-track,
+.marquee-row:hover .marquee-track-reverse {
+  animation-play-state: paused;
+}
+@keyframes marquee-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes marquee-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Hides the scrollbar on the mobile testimonial carousel's snap-scroll
+   row (scrolling still works via touch/drag, just no visible bar). */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hover-lift {
+  @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl;
+}
+
+
+
+/* ============================================
+   Rich hover system — shadow, color-invert, gradient sweep, text highlight.
+   Applied on top of .hover-lift across cards/sections/text so hovering any
+   interactive element gives clear, consistent feedback: deeper shadow,
+   inverted (opposite) color scheme via a gradient, every child re-colored
+   to match.
+   ============================================ */
+
+/* For light / white / low-opacity-tint elements: hover inverts to a green
+   gradient with cream text (features cards, month cards, perk cards,
+   vocabulary + testimonial cards). */
+.card-hover-invert {
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+.card-hover-invert:hover {
+  background-image: linear-gradient(135deg, #7ED856 0%, #3F7A2A 100%) !important;
+  border-color: #3F7A2A !important;
+  box-shadow: 0 20px 45px rgba(63, 122, 42, 0.35) !important;
+}
+.card-hover-invert:hover * {
+  color: #FCFAF1 !important;
+}
+.card-hover-invert:hover svg {
+  color: #FCFAF1 !important;
+  stroke: #FCFAF1 !important;
+}
+
+/* Testimonial cards specifically: a softer, more diffused glow on hover —
+   two layered shadows (a tight one + a big soft one) read as "blurred"
+   rather than a single hard-edged drop shadow. Standalone — no color
+   invert, so avatar colors / star ratings stay legible. */
+.testimonial-glow:hover {
+  box-shadow:
+    0 12px 24px -8px rgba(63, 122, 42, 0.18),
+    0 32px 64px -12px rgba(63, 122, 42, 0.22) !important;
+}
+
+/* For elements that are already solid/heavy green or dark: hover inverts to
+   a dark gradient with cream text (stat boxes, features cards, the dark
+   Contest card going the other way). */
+.card-hover-invert-dark {
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+.card-hover-invert-dark:hover {
+  background-image: linear-gradient(135deg, #223318 0%, #15170F 100%) !important;
+  border-color: #15170F !important;
+  box-shadow: 0 20px 45px rgba(21, 23, 15, 0.45) !important;
+}
+/* :not(.chip-static, .chip-static *) keeps any inner "chip-static" element
+   (e.g. the light "Today's topic" preview chip) at its own fixed colors,
+   instead of being forced to near-white text on its own light background —
+   that's what made its text unreadable on hover before. */
+.card-hover-invert-dark:hover *:not(.chip-static, .chip-static *) {
+  color: #FCFAF1 !important;
+}
+.card-hover-invert-dark:hover svg:not(.chip-static svg) {
+  color: #7ED856 !important;
+  stroke: #7ED856 !important;
+}
+
+/* text links / small labels: an underline-style highlight sweep that grows
+   in from the left on hover, instead of an instant color snap */
+.text-hover-highlight {
+  background-image: linear-gradient(#7ED856, #7ED856);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  transition: background-size 0.3s ease, color 0.3s ease;
+  padding-bottom: 2px;
+}
+.text-hover-highlight:hover {
+  background-size: 100% 2px;
+  color: #3F7A2A;
+}
+
+.decor-circle {
+  @apply pointer-events-none absolute rounded-full bg-leaf-300/50 blur-2xl;
+  /* Fades the circle to transparent well before its own edge, using a
+     mask rather than relying on `blur` alone. These circles sit near
+     section corners and get clipped by the section's `overflow-hidden` —
+     blur alone still leaves a hard cut where the clip line lands, since
+     the underlying shape is still a solid-edged circle. The mask fades
+     the color out first, so whichever side ends up clipped was already
+     faded to near-nothing there, and it always reads as a soft glow
+     instead of a circle with one flat side.
+
+     The fade uses several gradual stops (instead of a single 30%→70%
+     jump) so the opacity curve tapers off slowly like a natural light
+     falloff, rather than stepping down quickly enough to still read as
+     a ring/edge once combined with blur. blur-2xl (up from blur-xl)
+     spreads that taper over more pixels so no boundary is visible at
+     normal viewing distance. */
+  mask-image: radial-gradient(
+    circle,
+    black 0%,
+    black 12%,
+    rgba(0, 0, 0, 0.75) 30%,
+    rgba(0, 0, 0, 0.45) 50%,
+    rgba(0, 0, 0, 0.18) 70%,
+    rgba(0, 0, 0, 0.05) 85%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle,
+    black 0%,
+    black 12%,
+    rgba(0, 0, 0, 0.75) 30%,
+    rgba(0, 0, 0, 0.45) 50%,
+    rgba(0, 0, 0, 0.18) 70%,
+    rgba(0, 0, 0, 0.05) 85%,
+    transparent 100%
+  );
+}
+
+
+/* ============================================
+   Auth pages (login/signup/forgot/reset) design tokens + component styles
+   Ported from the standalone auth project — scoped by their own class
+   names (.auth-page, .btn-submit, etc.) so they don't affect the rest
+   of the site.
+   ============================================ */
+/* ============================================
+   LingoCraft — Design tokens
+   ============================================ */
+:root {
+  --green: #7ED856;
+  --green-dark: #4C9A2A;
+  --green-deep: #2F6B1C;
+  --cream: #F8FAFC;
+  --ink: #2B2B28;
+  --muted: #6B6B64;
+  --border: #EDE8D8;
+  --white: #FFFFFF;
+  --error: #C0392B;
+
+  --font-display: var(--font-lora), Georgia, serif;
+  --font-body: var(--font-poppins), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+}
+
+/* base reset handled by Tailwind preflight + app body styles */
+
+:focus-visible {
+  outline: 2.5px solid var(--green-dark);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ============================================
+   AUTH SHELL (shared by /login, /signup, /forgot-password,
+   /reset-password) — a single centered white card floating on the same
+   cream background as the rest of the site (see body { @apply bg-cream }
+   above), matching the reference layout: no split brand panel, just a
+   compact logo mark above the title, then the form.
+   ============================================ */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream);
+  padding: 40px 20px;
+}
+
+/* The old two-column split (.brand-panel + .form-panel) is retired in
+   favor of one centered card. Both class names are kept so every existing
+   page (which still renders both <section>s) works without a JSX rewrite
+   — .brand-panel simply no longer renders, and .form-panel IS the card. */
+.brand-panel,
+.brand-panel__inner,
+.brand-copy,
+.chip-field,
+.brand-foot,
+.brand-panel::after {
+  display: none;
+}
+
+.form-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+}
+
+.form-panel__inner {
+  width: 100%;
+  max-width: 400px;
+  padding: 36px 32px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px -24px rgba(21, 23, 15, 0.18), 0 8px 24px -12px rgba(21, 23, 15, 0.06);
+}
+
+.form-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  color: var(--ink);
+  text-align: center;
+}
+
+.form-subtitle {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+  text-align: center;
+}
+.link { color: var(--green-deep); font-weight: 600; background:none; border:none; cursor:pointer; font-size: inherit; }
+.link:hover { text-decoration: underline; }
+.link--small { font-size: 13px; }
+
+form { margin-top: 22px; }
+
+.field { margin-bottom: 16px; }
+
+.field label {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.field-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.field-label-row label { margin-bottom: 0; }
+
+.field input[type="email"],
+.field input[type="password"],
+.field input[type="text"] {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 13px 16px 13px 44px;
+  transition: border-color 0.15s ease;
+}
+.field input::placeholder { color: #B4B0A2; }
+.field input:focus { border-color: var(--green); outline: none; }
+.field.has-error input { border-color: var(--error); }
+
+/* Leading icon shared by every input (email pin, password key) — the
+   input itself carries the left padding above so text never runs under it. */
+.field-input { position: relative; }
+.field-input__icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  display: flex;
+  pointer-events: none;
+}
+
+.password-input { position: relative; }
+.password-input input { padding-right: 46px; }
+.toggle-visibility {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 8px;
+}
+.toggle-visibility:hover { color: var(--ink); background: var(--border); }
+
+.field-error {
+  min-height: 18px;
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--error);
+  font-weight: 500;
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  color: var(--ink);
+  margin-bottom: 20px;
+  cursor: pointer;
+  user-select: none;
+}
+.remember input {
+  width: 17px; height: 17px;
+  accent-color: var(--green-dark);
+}
+
+.btn-submit {
+  width: 100%;
+  position: relative;
+  background: var(--green-dark);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15.5px;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 15px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.btn-submit:hover { background: var(--green-deep); }
+.btn-submit:active { transform: scale(0.99); }
+.btn-submit:disabled { opacity: 0.75; cursor: default; }
+
+.btn-submit.is-loading .btn-label { visibility: hidden; }
+.btn-spinner {
+  display: none;
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 18px; height: 18px;
+  margin: -9px 0 0 -9px;
+  border: 2.5px solid rgba(255,255,255,0.4);
+  border-top-color: var(--white);
+  border-radius: 50%;
+}
+.btn-submit.is-loading .btn-spinner {
+  display: block;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.form-status {
+  min-height: 20px;
+  margin-top: 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: center;
+}
+.form-status.success { color: var(--green-deep); }
+.form-status.error { color: var(--error); }
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0 18px;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.divider::before, .divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.divider span { padding: 0 14px; white-space: nowrap; }
+
+.btn-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 13px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14.5px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn-google:hover { background: #F6F4EC; }
+
+.auth-card__footer {
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 420px) {
+  .form-panel__inner { padding: 32px 24px; }
+  .form-title { font-size: 23px; }
+}
