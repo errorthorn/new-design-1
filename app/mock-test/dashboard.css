@@ -1,0 +1,652 @@
+/* Ported from the provided mock-test dashboard mockup. Header/nav rules were
+   dropped on purpose — this page reuses the shared <Navbar /> component
+   instead of a hand-rolled nav, so login state and links stay in one place. */
+
+.mt-page {
+  --mt-cream: #F8FAFC;
+  --mt-cream-2: #F8FAFC;
+  --mt-green: #7ed957;
+  --mt-green-hover: #68c846;
+  --mt-green-deep: #3e7a28;
+  --mt-green-soft: #eaf7e1;
+  --mt-black: #1b1b1b;
+  --mt-gray: #666666;
+  --mt-white: #ffffff;
+  --mt-green-tint: #7ed957;
+  --mt-green-tint-border: rgba(63, 122, 40, 0.4);
+  --mt-border: #ece7db;
+  --mt-amber: #FB923C;
+  --mt-amber-soft: #FFF1E5;
+  --mt-amber-shadow: rgba(251, 146, 60, 0.4);
+  --mt-rust: #A855F7;
+  --mt-rust-soft: #F6EBFE;
+  --mt-rust-shadow: rgba(168, 85, 247, 0.4);
+  --mt-green-shadow: rgba(62, 122, 40, 0.4);
+  --mt-ring-idle: #ddd8c9;
+  --mt-shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.04);
+  --mt-shadow-card: 0 12px 35px rgba(0, 0, 0, 0.05);
+  --mt-shadow-card-hover: 0 20px 60px rgba(0, 0, 0, 0.1);
+
+  color: var(--mt-black);
+  background: var(--mt-cream);
+  min-height: 100vh;
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  -webkit-font-smoothing: antialiased;
+}
+.mt-page .bn {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+}
+.mt-page button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ---------------- page header / hero strip ---------------- */
+/* Signature element: an IELTS band-scale ruler (0–9), color-zoned exactly
+   like the score rings/numbers elsewhere on this page (rust / amber /
+   green-deep). It's not decoration — it's the same legend the rest of the
+   dashboard already uses, made legible once instead of implied by color
+   alone, and it doubles as the header's visual anchor instead of a pair
+   of unrelated ambient blobs. */
+.mt-page-head {
+  position: relative;
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 56px 40px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+}
+.mt-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--mt-green-deep);
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+/* three-bar audio-level mark, standing in for the pulsing dot — this is a
+   speaking test, so the kicker's accent references voice input, not a
+   generic "live" indicator */
+.mt-eyebrow .mt-levels {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+.mt-eyebrow .mt-levels span {
+  width: 3px;
+  background: var(--mt-green-deep);
+  border-radius: 1px;
+  animation: mt-level-bounce 1.1s ease-in-out infinite;
+}
+.mt-eyebrow .mt-levels span:nth-child(1) { height: 40%; animation-delay: 0s; }
+.mt-eyebrow .mt-levels span:nth-child(2) { height: 100%; animation-delay: 0.15s; }
+.mt-eyebrow .mt-levels span:nth-child(3) { height: 65%; animation-delay: 0.3s; }
+@keyframes mt-level-bounce {
+  0%, 100% { transform: scaleY(0.55); }
+  50% { transform: scaleY(1); }
+}
+
+.mt-page-head h1 {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-style: italic;
+  font-size: 38px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  letter-spacing: -0.3px;
+  line-height: 1.15;
+}
+.mt-page-head p {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--mt-gray);
+  max-width: 520px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ---- band score bubble cluster ---- */
+.mt-scale {
+  flex: none;
+  width: 300px;
+  padding-bottom: 6px;
+}
+.mt-scale-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--mt-gray);
+  margin-bottom: 8px;
+}
+.mt-scale-label b {
+  color: var(--mt-black);
+  font-weight: 800;
+}
+
+/* ---------------- entrance animation ---------------- */
+@keyframes mt-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.mt-fade-up {
+  animation: mt-fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mt-fade-up,
+  .mt-eyebrow .mt-levels span,
+  .mt-skel {
+    animation: none !important;
+  }
+  .mt-card,
+  .mt-stat-card {
+    transition: none !important;
+  }
+  .mt-card:hover {
+    transform: none !important;
+  }
+}
+@media (max-width: 720px) {
+  .mt-page-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+  }
+  .mt-scale {
+    width: 100%;
+  }
+}
+
+/* ---------------- stats ---------------- */
+/* Back to three separate cards with their own ring, per Irfan's call —
+   each card keeps the clean white surface from the strip version rather
+   than the old flat page background, so the ring/number combo reads as
+   a distinct, elevated stat rather than floating on the page. */
+.mt-stats {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 0 40px 48px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.mt-stat-card {
+  background: var(--mt-white);
+  border: 1px solid var(--mt-border);
+  border-radius: 20px;
+  box-shadow: var(--mt-shadow-card);
+  padding: 26px 28px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.mt-stat-num {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--mt-black);
+  line-height: 1;
+}
+.mt-stat-unit {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mt-gray);
+  margin-left: 4px;
+}
+.mt-stat-label {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 13.5px;
+  color: var(--mt-gray);
+  margin-top: 6px;
+}
+.mt-ringwrap {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  flex: none;
+}
+.mt-ringwrap svg {
+  width: 70px;
+  height: 70px;
+  transform: rotate(-90deg);
+}
+.mt-ringwrap circle {
+  fill: none;
+  stroke-width: 6;
+}
+.mt-ring-bg {
+  stroke: #efeee3;
+}
+.mt-ring-fg {
+  stroke: var(--mt-green);
+  stroke-linecap: round;
+  transition: stroke 0.3s ease;
+}
+/* Tone classes: a band score means something, so the ring should say it
+   at a glance — strong (7+), developing (5.5–6.9), needs work (<5.5) —
+   instead of every ring reading as uniformly "good" regardless of score. */
+.mt-ring-mid .mt-ring-fg {
+  stroke: var(--mt-amber);
+}
+.mt-ring-low .mt-ring-fg {
+  stroke: var(--mt-rust);
+}
+.mt-ring-none .mt-ring-fg {
+  stroke: var(--mt-ring-idle);
+}
+/* Same tone, applied to the score number itself — so a 5.0 in rust-red
+   text sits next to a rust-red ring instead of the ring doing all the
+   talking while the number stays flat black. Selectors are written to
+   out-specificity .mt-best-txt b / .mt-stat-num's own color rules. */
+.mt-best-txt b.mt-tone-high,
+.mt-stat-num.mt-tone-high {
+  color: var(--mt-green-deep);
+}
+.mt-best-txt b.mt-tone-mid,
+.mt-stat-num.mt-tone-mid {
+  color: var(--mt-amber);
+}
+.mt-best-txt b.mt-tone-low,
+.mt-stat-num.mt-tone-low {
+  color: var(--mt-rust);
+}
+
+/* ---------------- filters ---------------- */
+.mt-filters {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 0 40px 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mt-tab {
+  background: var(--mt-white);
+  border: 1px solid var(--mt-border);
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--mt-gray);
+  transition: all 0.2s ease;
+}
+.mt-tab:hover {
+  border-color: var(--mt-green);
+  color: var(--mt-black);
+  box-shadow: 0 6px 16px rgba(63, 122, 40, 0.14);
+  transform: translateY(-1px);
+}
+.mt-tab.mt-active {
+  background: var(--mt-green);
+  border-color: var(--mt-green);
+  color: #173a0c;
+  box-shadow: 0 8px 20px rgba(126, 217, 87, 0.35);
+}
+
+/* ---------------- weekly grid ---------------- */
+.mt-grid {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 0 40px 100px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.mt-card {
+  background: var(--mt-white);
+  border: 1px solid var(--mt-border);
+  border-radius: 20px;
+  box-shadow: var(--mt-shadow-card);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+}
+.mt-card {
+  transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, background 0.4s ease, color 0.35s ease;
+}
+.mt-card:hover {
+  box-shadow: var(--mt-shadow-card-hover);
+  transform: translateY(-5px) scale(1.008);
+  border-color: var(--mt-green-deep);
+}
+.mt-card:hover .mt-week-badge {
+  background: rgba(78, 154, 46, 0.14);
+  color: var(--mt-green-deep);
+}
+.mt-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.mt-week-badge {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--mt-black);
+  background: var(--mt-cream);
+  border: 1px solid var(--mt-border);
+  padding: 6px 13px;
+  border-radius: 10px;
+}
+.mt-status {
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 5px 11px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.mt-status svg {
+  width: 12px;
+  height: 12px;
+}
+.mt-status.mt-done {
+  background: var(--mt-green-soft);
+  color: var(--mt-green-deep);
+}
+.mt-status.mt-live {
+  background: #fdf1dc;
+  color: #9c6b12;
+}
+.mt-status.mt-locked {
+  background: #f1f0ea;
+  color: #9a968a;
+}
+.mt-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.35;
+}
+.mt-card .mt-date {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 14px;
+  color: #2e2e2e;
+  margin-top: -8px;
+}
+.mt-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 14px;
+  color: #2e2e2e;
+}
+.mt-meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mt-meta svg {
+  width: 14px;
+  height: 14px;
+}
+.mt-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--mt-border);
+}
+.mt-best {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mt-ringwrap.mt-small {
+  width: 44px;
+  height: 44px;
+}
+.mt-ringwrap.mt-small svg {
+  width: 44px;
+  height: 44px;
+}
+.mt-ringwrap.mt-small .mt-ring-fg,
+.mt-ringwrap.mt-small .mt-ring-bg {
+  stroke-width: 5;
+}
+.mt-best-txt {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 13px;
+  color: var(--mt-gray);
+  line-height: 1.3;
+}
+.mt-best-txt b {
+  display: block;
+  font-size: 16.5px;
+  color: var(--mt-black);
+  font-family: var(--font-display, "Lora", Georgia, serif);
+}
+.mt-btn {
+  border-radius: 999px;
+  padding: 12px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  transition: all 0.2s ease;
+}
+.mt-btn svg {
+  width: 14px;
+  height: 14px;
+}
+.mt-btn.mt-primary {
+  background: var(--mt-green);
+  color: #173a0c;
+}
+.mt-btn.mt-primary:hover {
+  background: var(--mt-green-hover);
+}
+.mt-btn.mt-ghost {
+  background: var(--mt-white);
+  color: var(--mt-black);
+  border: 1.5px solid var(--mt-border);
+}
+.mt-btn.mt-ghost:hover {
+  border-color: var(--mt-black);
+}
+.mt-btn.mt-disabled {
+  background: #f1f0ea;
+  color: #a6a296;
+  pointer-events: none;
+}
+.mt-card.mt-featured {
+  border-color: var(--mt-green);
+  background: linear-gradient(180deg, #f6fbf1, #ffffff);
+  grid-column: span 2;
+  box-shadow: 0 16px 46px rgba(126, 217, 87, 0.22), var(--mt-shadow-card);
+}
+.mt-card.mt-featured h3 {
+  font-size: 23px;
+}
+.mt-empty {
+  max-width: 1340px;
+  margin: 20px auto 0;
+  padding: 48px 40px 100px;
+  color: var(--mt-gray);
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  text-align: center;
+}
+.mt-empty-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 14px;
+  color: var(--mt-green-deep);
+  opacity: 0.5;
+}
+.mt-empty p {
+  font-size: 15px;
+  margin: 0 0 18px;
+}
+.mt-empty .mt-btn {
+  display: inline-flex;
+}
+
+/* ---------------- loading skeleton ---------------- */
+.mt-skeleton-wrap {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 56px 40px 100px;
+}
+.mt-skel {
+  background: linear-gradient(90deg, #efece0 25%, #f7f4ea 37%, #efece0 63%);
+  background-size: 400% 100%;
+  animation: mt-shimmer 1.6s ease infinite;
+  border-radius: 12px;
+}
+@keyframes mt-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+.mt-skel-eyebrow {
+  width: 210px;
+  height: 26px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+.mt-skel-title {
+  width: min(60%, 460px);
+  height: 38px;
+  margin-bottom: 12px;
+}
+.mt-skel-sub {
+  width: min(80%, 540px);
+  height: 16px;
+  margin-bottom: 48px;
+}
+.mt-skel-stats,
+.mt-skel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.mt-skel-stats {
+  margin-bottom: 28px;
+}
+.mt-skel-stat {
+  height: 108px;
+  border-radius: 20px;
+}
+.mt-skel-card {
+  height: 210px;
+  border-radius: 20px;
+}
+@media (max-width: 980px) {
+  .mt-skel-stats { grid-template-columns: 1fr; }
+  .mt-skel-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .mt-skeleton-wrap { padding: 40px 20px 60px; }
+  .mt-skel-grid { grid-template-columns: 1fr; }
+}
+
+.mt-footer-note {
+  text-align: center;
+  padding: 16px 20px 70px;
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--mt-gray);
+}
+
+/* ---------------- result modal ---------------- */
+.mt-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 15, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+.mt-modal-backdrop {
+  animation: mt-fade-up 0.2s ease both;
+}
+.mt-modal {
+  background: var(--mt-white);
+  border-radius: 20px;
+  max-width: 560px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 28px;
+  box-shadow: var(--mt-shadow-card-hover);
+  animation: mt-modal-pop 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes mt-modal-pop {
+  from { opacity: 0; transform: scale(0.94) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.mt-modal h3 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  font-weight: 700;
+}
+.mt-modal .mt-modal-sub {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 13.5px;
+  color: var(--mt-gray);
+  margin-bottom: 18px;
+}
+.mt-modal .mt-transcript {
+  font-family: var(--font-display, "Lora", Georgia, serif);
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  background: var(--mt-cream);
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid var(--mt-border);
+}
+.mt-modal-close {
+  margin-top: 18px;
+  width: 100%;
+}
+
+@media (max-width: 980px) {
+  .mt-stats {
+    grid-template-columns: 1fr;
+  }
+  .mt-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .mt-page-head {
+    padding: 40px 20px 28px;
+  }
+  .mt-page-head h1 {
+    font-size: 28px;
+  }
+  .mt-stats {
+    padding: 0 20px 32px;
+  }
+  .mt-filters {
+    padding: 0 20px 20px;
+  }
+  .mt-grid {
+    grid-template-columns: 1fr;
+    padding: 0 20px 60px;
+  }
+  .mt-card.mt-featured {
+    grid-column: span 1;
+  }
+}
